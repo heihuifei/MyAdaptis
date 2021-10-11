@@ -14,9 +14,11 @@ class ToyDataset(BaseDataset):
         self.dataset_split = split
 
         self.dataset_samples = []
+        # 读取rgb.png图片并且进行命名排序
         images_path = sorted((self.dataset_path / split).rglob('*rgb.png'))
         for image_path in images_path:
             image_path = str(image_path)
+            # 将图片名称中子字符串进行替换
             mask_path = image_path.replace('rgb.png', 'im.png')
             self.dataset_samples.append((image_path, mask_path))
 
@@ -25,6 +27,7 @@ class ToyDataset(BaseDataset):
 
         image = cv2.imread(image_path)
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        # 将图片按照原格式读取，并将读取的矩阵uint8数据格式转换为int32格式
         instances_mask = cv2.imread(mask_path, cv2.IMREAD_UNCHANGED).astype(np.int32)
 
         sample = {'image': image}

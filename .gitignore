@@ -3,3 +3,6 @@
 experiments/*
 *.so
 *.ipynb_checkpoints*
+toyV2
+.gitignore
+log*
