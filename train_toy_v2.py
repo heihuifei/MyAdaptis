@@ -69,6 +69,7 @@ def train(model, model_cfg, args, train_proposals, start_epoch=0):
         Flip()
     ], p=1.0)
 
+    # 加载数据集
     trainset = ToyDataset(
         args.dataset_path,
         split='train',

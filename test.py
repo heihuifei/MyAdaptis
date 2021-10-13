@@ -10,16 +10,16 @@ from adaptis.model.toy.models import get_unet_model
 from adaptis.coco.panoptic_metric import PQStat, pq_compute, print_pq_stat
 from adaptis.utils.vis import visualize_instances, visualize_proposals
 
-device = torch.device('cuda:0')
+#device = torch.device('cuda:0')
 
-dataset_path = '/home/guest01/projects/adaptis/toyV2/'
-dataset = ToyDataset(dataset_path, split='test', with_segmentation=True)
+# dataset_path = '/home/guest01/projects/adaptis/toyV2/'
+# dataset = ToyDataset(dataset_path, split='test', with_segmentation=True)
 
-model = get_unet_model(norm_layer=torch.nn.BatchNorm2d, with_proposals=True)
-pmodel = AdaptISPrediction(model, dataset, device)
+# model = get_unet_model(norm_layer=torch.nn.BatchNorm2d, with_proposals=True)
+# pmodel = AdaptISPrediction(model, dataset, device)
 
-weights_path = '/home/guest01/projects/adaptis/experiments/toy_v2/001/checkpoints/last_checkpoint.params'
-pmodel.load_parameters(weights_path)
+# weights_path = '/home/guest01/projects/adaptis/experiments/toy_v2/001/checkpoints/last_checkpoint.params'
+# pmodel.load_parameters(weights_path)
 
 def test_model(pmodel, dataset,
                sampling_algorithm, sampling_params,
@@ -75,18 +75,45 @@ def visulization():
         cv2.imwrite("image_mask.png", visualize_instances(pred['instances_mask']))
         cv2.imwrite("image_prop.png", visualize_proposals(pred['proposals_info']))
 
+# 遍历图片的每一个像素
+def access_pixels(img):
+    """遍历图像每个像素的每个通道"""
+    print(img.shape)              #打印图像的高，宽，通道数（返回一个3元素的tuple）
+    height = img.shape[0]        #将tuple中的元素取出，赋值给height，width，channels
+    width = img.shape[1]
+    channels = img.shape[2]
+    print("height:%s,width:%s,channels:%s" % (height,width,channels))
+    print(img.size)              #打印图像数组内总的元素数目（总数=高X宽X通道数）
+    cnt = 0
+    for row in range(height):    #遍历每一行
+        for col in range(width): #遍历每一列
+            for channel in range(channels):    #遍历每个通道（三个通道分别是BGR）
+                if img[row][col][channel] != 0:
+                    cnt += 1
+                    img[row][col][channel] = 150
+                #通过数组索引访问该元素，并作出处理
+    # cv2.imshow("processed img",img) #将处理后的图像显示出来
+    cv2.imwrite("./sample1.png", img)
+    print("the non zero pixels nums is： ", cnt)
+
 # visulization()
  
-proposals_sampling_params = {
-    'thresh1': 0.4,
-    'thresh2': 0.5,
-    'ithresh': 0.3,
-    'fl_prob': 0.10,
-    'fl_eps': 0.003,
-    'fl_blur': 2,
-    'max_iters': 100
-}
-test_model(pmodel, dataset,
-           sampling_algorithm='proposals',
-           sampling_params=proposals_sampling_params,
-           use_flip=False)
+# proposals_sampling_params = {
+#     'thresh1': 0.4,
+#     'thresh2': 0.5,
+#     'ithresh': 0.3,
+#     'fl_prob': 0.10,
+#     'fl_eps': 0.003,
+#     'fl_blur': 2,
+#     'max_iters': 100
+# }
+# test_model(pmodel, dataset,
+#            sampling_algorithm='proposals',
+#            sampling_params=proposals_sampling_params,
+#            use_flip=False)
+
+image_train_sample1 = cv2.imread("/home/guest01/projects/adaptis/toyV2/train/00000_013_im.png")
+access_pixels(image_train_sample1)
+
+image_train_sample2 = cv2.imread("/home/guest01/projects/adaptis/toyV2/train/00000_013_rgb.png")
+print(image_train_sample2)
